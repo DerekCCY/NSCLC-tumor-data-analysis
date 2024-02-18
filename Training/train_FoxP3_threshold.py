@@ -6,7 +6,7 @@ import cv2
 import config
 import os
 
-from dataset import FucciDataset
+from dataset import FoxP3_Dataset
 from transform_alb import train_transform, val_transform
 from torch.utils.data import DataLoader
 

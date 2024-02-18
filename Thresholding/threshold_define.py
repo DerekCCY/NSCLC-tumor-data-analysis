@@ -40,8 +40,14 @@ def main():
     
     mean = df[args.column_name].mean()
     std = df[args.column_name].std()
+    q0 = df[args.column_name].quantile(0)
+    q1 = df[args.column_name].quantile(0.25)
+    q2 = df[args.column_name].quantile(0.5)
+    q3 = df[args.column_name].quantile(0.75)
+    q4 = df[args.column_name].quantile(1)
     print(f'Mean: {mean}')
     print(f'Std: {std}')
+    print(f'q0: {q0}, q1: {q1}, q2: {q2}, q3: {q3}, q4: {q4}')
     
     # 繪製直方圖和正態分佈曲線
     plt.figure(figsize=(20,15))
@@ -62,13 +68,11 @@ def main():
     
     '''========================================================== Thresholding ================================================================'''
     
-    threshold_value = mean + 3 * std
+    threshold_value = mean
     
-    # observe how many points are bigger than threshold
-    threshold_points = df[ df[args.column_name] > threshold_value ]
-    print(threshold_points)
-    
-    for sample_name in threshold_points['Sample Name'].unique():
+    for sample_name in df['Sample Name'].unique():
+        
+        print(f'sample_name: {sample_name}')
         
         base_name = sample_name.split('.im3')[0]
         coordinate_name = '_FoxP3_path_view.tif'
@@ -77,12 +81,19 @@ def main():
         input_image = os.path.join(args.input_image_path, complete_name)
         image = Image.open(input_image)
         draw = ImageDraw.Draw(image)
-        
+        # Coordinate problem
+        image_height = image.size[1]
+    
+        # observe how many points are bigger than threshold
+        threshold_points = df[ (df['Sample Name'] == sample_name) & (df[args.column_name] > threshold_value) ]
+
+        print("threshold_points")
+        print(threshold_points)
         #sample_points = threshold_points [ threshold_points['Sample Name'] == sample_name ]
         
         for _, points in threshold_points.iterrows():
             x = points['Cell X Position']
-            y = points['Cell Y Position']
+            y = image_height - points['Cell Y Position'] 
             
             draw.ellipse([x-5, y-5, x+5, y+5], outline='blue', fill='blue')
     
