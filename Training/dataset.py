@@ -8,7 +8,7 @@ from PIL import Image, ImageEnhance
 import numpy as np
 import matplotlib.pyplot as plt
 
-class FucciDataset(Dataset):
+class FoxP3_Dataset(Dataset):
     def __init__(self, image_dir, label_dir,transform=None):
         
         self.images = sorted(os.listdir(str(image_dir)))
@@ -23,12 +23,12 @@ class FucciDataset(Dataset):
     def __getitem__(self, index):
         
         image_path, label_path = self.images_and_label[index]
-        image = cv2.imread(image_path)
-        image = cv2.cvtColor(image, cv2.IMREAD_COLOR)
+        
+        image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        #image = cv2.cvtColor(image, cv2.IMREAD_COLOR)
         cv2.imwrite("image.png", image)
         
-        label = cv2.imread(label_path, cv2.IMREAD_GRAYSCALE)
-
+        label = cv2.imread(label_path, cv2.IMREAD_COLOR)
         cv2.imwrite("label.png", label)
         
         if self.transform is not None:
