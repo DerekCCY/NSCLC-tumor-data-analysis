@@ -10,63 +10,75 @@ from PIL import Image, ImageDraw
 
 from utils import *
 
-
 def main():
+    
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_file_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Data/Opal immune cells/35 patients 的immune cell 資料/Opal 221_1_all immune cell subsets.xlsx')
-    parser.add_argument('--input_image_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Data/Opal immune cells/image/221_1')
+    parser.add_argument('--input_file_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Data/Opal immune cells/35 patients 的immune cell 資料')
+    parser.add_argument('--input_image_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Data/Opal immune cells/image/221_2')
     parser.add_argument('--column_name', default = 'Nucleus FoxP3 (Opal 620) Mean (Normalized Counts, Total Weighting)')
-    parser.add_argument('--save_data_visualizing_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Images/Threaholding/data_visualizing')
+    parser.add_argument('--save_data_visualizing_root', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Images/Threaholding/data_visualizing')
     parser.add_argument('--save_output_image_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Images/Threaholding/output_image')
     args = parser.parse_args()
     
     '''=========================================================== Data Value ==============================================================='''
-    data = pd.read_excel(args.input_file_path, usecols='C, E, F, K')  # Read the Excel file
-    df = pd.DataFrame(data)  # Create a DataFrame from the data
-    print(df)
-    print(type(df))
-    preprocess_data(df)    
     
-    plt.figure(figsize=(20, 15))
-    sns.set_theme()
-    sns.set_style('whitegrid')
-    sns.set_context(font_scale=1)
-    sns.barplot(x= df['Sample Name'], y=df['Nucleus FoxP3 (Opal 620) Mean (Normalized Counts, Total Weighting)'])
-    plt.xticks(rotation = 90)
-    plt.title('FoxP3 Data Observation')
-    plt.savefig(os.path.join(args.save_data_visualizing_path, "FoxP3_Data_Observation.png"), bbox_inches='tight')
+    columns = ['File Name', 'Mean_original', 'Std_original', 'q1_original', 'q2_original', 'q3_original','Mean', 'Std', 'q1', 'q2', 'q3']
+    result_df = pd.DataFrame(columns=columns)
     
-    '''========================================================= Data Distribution =========================================================='''
+    for filename in sorted(os.listdir(args.input_file_path)):
+        
+        file = os.path.join(args.input_file_path, filename)
+        if os.path.isfile(file):
+            data = pd.read_excel(file, usecols='C, E, F, K')  # Read the Excel file
+            df = pd.DataFrame(data)  # Create a DataFrame from the data
+            print(df)
+            print(type(df))
+            preprocess_data(df)    
     
-    mean = df[args.column_name].mean()
-    std = df[args.column_name].std()
-    q0 = df[args.column_name].quantile(0)
-    q1 = df[args.column_name].quantile(0.25)
-    q2 = df[args.column_name].quantile(0.5)
-    q3 = df[args.column_name].quantile(0.75)
-    q4 = df[args.column_name].quantile(1)
-    print(f'Mean: {mean}')
-    print(f'Std: {std}')
-    print(f'q0: {q0}, q1: {q1}, q2: {q2}, q3: {q3}, q4: {q4}')
-    
-    # 繪製直方圖和正態分佈曲線
-    plt.figure(figsize=(20,15))
-    sns.histplot(df[args.column_name], kde=True, color='skyblue', bins=30, stat='density', label='Data Distribution')
-    plt.title('Data distribution and Normal distribution curve')
-    plt.xlabel('value')
-    plt.ylabel('density')
+            plt.figure(figsize=(20, 15))
+            sns.set_theme()
+            sns.set_style('whitegrid')
+            sns.set_context(font_scale=1)
+            sns.barplot(x= df['Sample Name'], y=df['Nucleus FoxP3 (Opal 620) Mean (Normalized Counts, Total Weighting)'])
+            plt.xticks(rotation = 90)
+            plt.title('FoxP3 Data Observation')
+            
+            saved_path = os.path.join(args.save_data_visualizing_root, filename)
+            if not os.path.exists(saved_path):
+                os.mkdir(saved_path)                
 
-    # 繪製正態分佈曲線
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = norm.pdf(x, mean, std)
-    plt.plot(x, p, 'k', linewidth=2, label='Normal Distribution Curve')
+            plt.savefig(os.path.join(saved_path, "FoxP3_Data_Observation.png"), bbox_inches='tight')
     
-    # 添加圖例
-    plt.legend()
-    plt.savefig(os.path.join(args.save_data_visualizing_path,"Data_distribution_and_Normal_distribution_curve.png"), bbox_inches = 'tight')
+            '''========================================================= Original Data Distribution =========================================================='''
+            # save statistic 
+            stats = statistics(df[args.column_name])
+            stats['File Name'] = filename
+            result_df = pd.concat([result_df, pd.DataFrame(stats, index=[0])], ignore_index=True)
+            
+            # Histogram and Distribution Curve
+            plt.figure(figsize=(20,15))
+            sns.histplot(df[args.column_name], kde=True, color='skyblue', bins=30, stat='density', label='Data Distribution')
+            plt.title('Data distribution and Normal distribution curve')
+            plt.xlabel('value')
+            plt.ylabel('density')
+
+            # Normal Distribution Curve
+            mean = df[args.column_name].mean()
+            std = df[args.column_name].std()
+            xmin, xmax = plt.xlim()
+            x = np.linspace(xmin, xmax, 100)
+            p = norm.pdf(x, mean, std)
+            plt.plot(x, p, 'k', linewidth=2, label='Normal Distribution Curve')
+
+            # 添加圖例
+            plt.legend()
+            plt.savefig(os.path.join(saved_path,"Data_distribution_and_Normal_distribution_curve.png"), bbox_inches = 'tight')
+            
+    # 將結果寫入 Excel 檔案
+    result_excel_path = '/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Images/Threaholding/statistics/statistics.xlsx'
+    result_df.to_excel(result_excel_path, index=False)     
     
-    '''========================================================== Thresholding ================================================================'''
+    '''========================================================== Thresholding ================================================================
     
     threshold_value = mean
     
@@ -97,7 +109,7 @@ def main():
             
             draw.ellipse([x-5, y-5, x+5, y+5], outline='blue', fill='blue')
     
-        image.save(os.path.join(args.save_output_image_path, str(base_name)+'.png'))
+        image.save(os.path.join(args.save_output_image_path, str(base_name)+'.png'))'''
         
 if __name__ == "__main__":
     main()

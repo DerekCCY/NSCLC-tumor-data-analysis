@@ -24,7 +24,7 @@
    - ## Description
       * Define signal intensity thresholds and thus redefine the selected immune subsets with high accuracy through data
 
-      * Select the columns (immune cells) we want to observe to calculate their mean value and std value, and then define the threshold.
+      * Select the columns (immune cells) we want to observe to calculate their mean value and std value, quartile value, and then define the threshold.
 
       * Project the values from excel to images
 
