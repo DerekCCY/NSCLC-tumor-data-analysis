@@ -59,12 +59,16 @@ def statistics(df):
     # 將所有數值大於 0 的值提取出來計算統計量
     positive_values = df[df >= 0.01].dropna()
     print(f'Number of non-zero values: {positive_values.count()}')
+    
     mean = positive_values.mean()
     std = positive_values.std()
     q1 = positive_values.quantile(0.25)
     q2 = positive_values.quantile(0.5)
     q3 = positive_values.quantile(0.75)
     print(f'Mean: {mean} | Std: {std} | q1: {q1} | q2: {q2} | q3: {q3}')
+    
+    threshold_values = df[df >= 0.08].dropna()
+    print(f'Number of values > thresholds: {threshold_values.count()}')
     
     return {'Mean_original': mean_original , 'Std_original': std_original, 'q1_original':q1_original, 
             'q2_original':q2_original, 'q3_original': q3_original, 'Mean': mean , 'Std': std, 'q1':q1, 'q2':q2, 'q3': q3}
