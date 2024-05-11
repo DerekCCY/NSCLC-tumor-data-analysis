@@ -46,9 +46,16 @@ def preprocess_data(df):
 
 '''Calculate statistics'''
 
+# 看有多少量大於threshold
+def thresholds_count(df, value):
+    number =  df[df >= value].dropna()
+    print(f'Number of values > thresholds: {number.count()}')  
+    
+    return number.count()  
+
+# 給入dataframe
 def statistics(df):
     
-    print(f'Number of non-zero values: {df.count()}')
     mean_original = df.mean()
     std_original = df.std()
     q1_original = df.quantile(0.25)
@@ -57,7 +64,7 @@ def statistics(df):
     print(f'Mean_original: {mean_original} | Std_original: {std_original} | q1_original: {q1_original} | q2_original: {q2_original} | q3_original: {q3_original}')
     
     # 將所有數值大於 0 的值提取出來計算統計量
-    positive_values = df[df >= 0.01].dropna()
+    positive_values = df[df >= 0.01].dropna()  #取大於0好像會有點問題，所以我寫大於0.01
     print(f'Number of non-zero values: {positive_values.count()}')
     
     mean = positive_values.mean()
@@ -67,10 +74,13 @@ def statistics(df):
     q3 = positive_values.quantile(0.75)
     print(f'Mean: {mean} | Std: {std} | q1: {q1} | q2: {q2} | q3: {q3}')
     
-    threshold_values = df[df >= 0.08].dropna()
-    print(f'Number of values > thresholds: {threshold_values.count()}')
+    bigger_than_mean = thresholds_count(df, mean)
+    bigger_than_q1 = thresholds_count(df, q1)
+    bigger_than_q2 = thresholds_count(df, q2)
+    bigger_than_q3 = thresholds_count(df, q3)
     
     return {'Mean_original': mean_original , 'Std_original': std_original, 'q1_original':q1_original, 
-            'q2_original':q2_original, 'q3_original': q3_original, 'Mean': mean , 'Std': std, 'q1':q1, 'q2':q2, 'q3': q3}
+            'q2_original':q2_original, 'q3_original': q3_original, 'Mean': mean , 'bigger_than_mean': bigger_than_mean, 'Std': std, 
+            'q1':q1, 'bigger_than_q1': bigger_than_q1, 'q2':q2, 'bigger_than_q2': bigger_than_q2, 'q3': q3, 'bigger_than_q3': bigger_than_q3}
     
     

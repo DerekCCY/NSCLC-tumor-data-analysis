@@ -20,10 +20,11 @@ def main():
     parser.add_argument('--save_output_image_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Images/Threaholding/output_image')
     args = parser.parse_args()
     
-    '''=========================================================== Data Value ==============================================================='''
-    
-    columns = ['File Name', 'Mean_original', 'Std_original', 'q1_original', 'q2_original', 'q3_original','Mean', 'Std', 'q1', 'q2', 'q3']
+    # result_df 存計算結果
+    columns = ['File Name', 'Mean_original', 'Std_original', 'q1_original', 'q2_original', 'q3_original','Mean', 'bigger_than_mean', 'Std', 'q1','bigger_than_q1', 'q2','bigger_than_q2', 'q3', 'bigger_than_q3']
     result_df = pd.DataFrame(columns=columns)
+    
+    '''=========================================================== Data Value ==============================================================='''
     
     for filename in sorted(os.listdir(args.input_file_path)):
         
@@ -33,6 +34,8 @@ def main():
             df = pd.DataFrame(data)  # Create a DataFrame from the data
             print(df)
             print(type(df))
+            
+            # 檢查有無缺失值
             preprocess_data(df)    
     
             plt.figure(figsize=(20, 15))
@@ -93,6 +96,7 @@ def main():
         input_image = os.path.join(args.input_image_path, complete_name)
         image = Image.open(input_image)
         draw = ImageDraw.Draw(image)
+        
         # Coordinate problem
         image_height = image.size[1]
     
