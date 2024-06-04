@@ -25,7 +25,7 @@ def metric_percentage_calculation(new_metric ,data, index, column, normalize):
             row_max = normalized_row.max()   #取每橫列中最大值
             #print(row_min)
             #print(row_max)
-            new_metric[i, :] = (normalized_row - row_min) / (row_max - row_min) * 100   #一列一列做標準化
+            new_metric[i, :] = (normalized_row - row_min) / (row_max - row_min) * 100  
         else :
             row_min = data[i, :].min()
             row_max = data[i, :].max()

@@ -72,15 +72,15 @@ def statistics(df):
     q1 = positive_values.quantile(0.25)
     q2 = positive_values.quantile(0.5)
     q3 = positive_values.quantile(0.75)
-    print(f'Mean: {mean} | Std: {std} | q1: {q1} | q2: {q2} | q3: {q3}')
+    print(f'Mean: {mean} | Std: {std} | Q1: {q1} | Q2: {q2} | Q3: {q3}')
     
     bigger_than_mean = thresholds_count(df, mean)
     bigger_than_q1 = thresholds_count(df, q1)
     bigger_than_q2 = thresholds_count(df, q2)
     bigger_than_q3 = thresholds_count(df, q3)
     
-    return {'Mean_original': mean_original , 'Std_original': std_original, 'q1_original':q1_original, 
-            'q2_original':q2_original, 'q3_original': q3_original, 'Mean': mean , 'bigger_than_mean': bigger_than_mean, 'Std': std, 
-            'q1':q1, 'bigger_than_q1': bigger_than_q1, 'q2':q2, 'bigger_than_q2': bigger_than_q2, 'q3': q3, 'bigger_than_q3': bigger_than_q3}
+    return {'Mean_original': mean_original , 'Std_original': std_original, 'Q1_original':q1_original, 
+            'Q2_original':q2_original, 'Q3_original': q3_original, 'Mean': mean , 'Bigger_than_Mean': bigger_than_mean, 'Std': std, 
+            'Q1':q1, 'Bigger_than_Q1': bigger_than_q1, 'Q2':q2, 'Bigger_than_Q2': bigger_than_q2, 'Q3': q3, 'Bigger_than_Q3': bigger_than_q3}
     
     

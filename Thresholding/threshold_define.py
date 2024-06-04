@@ -16,12 +16,12 @@ def main():
     parser.add_argument('--input_file_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Data/Opal immune cells/35 patients 的immune cell 資料')
     parser.add_argument('--input_image_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Data/Opal immune cells/image/221_2')
     parser.add_argument('--column_name', default = 'Nucleus FoxP3 (Opal 620) Mean (Normalized Counts, Total Weighting)')
-    parser.add_argument('--save_data_visualizing_root', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Images/Threaholding/data_visualizing')
-    parser.add_argument('--save_output_image_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Images/Threaholding/output_image')
+    parser.add_argument('--save_data_visualizing_root', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Images/Threaholding/Data')
+    parser.add_argument('--save_output_image_path', default='/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Images/Threaholding/Output_image')
     args = parser.parse_args()
     
     # result_df 存計算結果
-    columns = ['File Name', 'Mean_original', 'Std_original', 'q1_original', 'q2_original', 'q3_original','Mean', 'bigger_than_mean', 'Std', 'q1','bigger_than_q1', 'q2','bigger_than_q2', 'q3', 'bigger_than_q3']
+    columns = ['File Name', 'Mean_original', 'Std_original', 'Q1_original', 'Q2_original', 'Q3_original','Mean', 'Bigger_than_Mean', 'Std', 'Q1','Bigger_than_Q1', 'Q2','Bigger_than_Q2', 'Q3', 'Bigger_than_Q3']
     result_df = pd.DataFrame(columns=columns)
     
     '''=========================================================== Data Value ==============================================================='''
