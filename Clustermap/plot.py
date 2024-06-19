@@ -18,7 +18,7 @@ def plot_boxplot(data, save_dir):
     plt.savefig(save_dir)
 
 
-def plot_clustermap(metric_df, save_dir):
+def plot_clustermap(metric_df, col_colors, save_dir):
     
     '''Plot Setting'''
     plt.style.use("classic")
@@ -27,23 +27,8 @@ def plot_clustermap(metric_df, save_dir):
     plt.rcParams['font.size'] = 16
     cmap = ListedColormap(sns.color_palette("RdBu_r",10))
     clustermap = sns.clustermap(metric_df, row_cluster=True, col_cluster=True, 
-                                method='average', cmap=cmap, figsize=(20, 12),
+                                method='average', cmap=cmap, figsize=(20, 12),col_colors=col_colors,
                                 metric='euclidean',linewidths=0.5, linecolor='black')
     clustermap.ax_heatmap.set_xticklabels(clustermap.ax_heatmap.get_xticklabels(), rotation=90)
     clustermap.ax_heatmap.set_yticklabels(clustermap.ax_heatmap.get_yticklabels(), rotation=0)
     plt.savefig(save_dir)
-
-def plot_neighborhood_enrichment(adata, cluster_key, save_dir):
-    sq.pl.nhood_enrichment(
-    adata,
-    cluster_key,
-    cmap="coolwarm",
-    title="",
-    method="ward",
-    dpi=300,
-    figsize=(10, 10),
-    save=save_dir,
-    cbar_kwargs={"label": "Z-score"},
-    vmin=-50,
-    vmax=50,
-)
