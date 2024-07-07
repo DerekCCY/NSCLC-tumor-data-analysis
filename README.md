@@ -10,12 +10,14 @@
 
       * Subsequently, as our focus is to observe the expression of each cell type across different patients, we performed Z-score normalization for each row and converted the expression levels of each patient into a percentage format. Finally, we employed the Euclidean distance metric to calculate similarity and utilized the average linkage method for hierarchical clustering. We then generated a heatmap and a relationship connection plot. The outcomes of this analysis were visualized to provide a clearer understanding of the relationships and patterns within our data. This approach offers a comprehensive and detailed insight into the cell density dynamics in our study population.
 
+      * In our graph, we also add the metadata in row and column which can help us classify different groups of patients.
+
    - ## Run
       - * `cd Clustermap`
       - * `python clustermap.py`
-      - * Log normalization
-   
-   - ## Results in 'Images/Clustermap' file
+      - * Select Log normalization and Max-Min method
+      
+   - ## Results in 'Results/Clustermap/Normalizing' file
       - * show the expression level of immune cell and cluster them into groups
 
 

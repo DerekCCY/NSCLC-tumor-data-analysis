@@ -17,43 +17,45 @@ from _utils import *
 '''------ data_directory: Input File Directory ------'''
 def main(data_directory):
     
-    ### === clustering_data_generation ===
+    ''' Clustering_data_generation '''
     metric, cname1, cname2 = clustering_data_generation(data_directory)
     
-    metric_df = pd.DataFrame(metric, index=cname1, columns=cname2)
-    
-    '''Add a test target'''
-    genders = np.random.choice(['Male', 'Female'], size=metric_df.shape[1])
-    gender_row = pd.DataFrame([genders], columns=metric_df.columns[0:], index=['Gender'])
-    metric_df = pd.concat([gender_row, metric_df])
-    
-    row_dict = {'Male': 'green', 'Female': 'yellow'}
+    ''' Metadata '''
+    col_metadata = pd.read_excel("Data/Endometrial cancer Panel 2 cell density data/meta_data/col_metadata.xlsx",index_col=0)
+    row_metadata = pd.read_excel("Data/Endometrial cancer Panel 2 cell density data/meta_data/row_metadata.xlsx",index_col=0)
+    row_colors, col_colors, row_palette, col_palette = metadata(row_metadata, col_metadata)
 
-    col_colors = metric_df.loc['Gender'].map(row_dict)
-    metric = metric_df.drop(index='Gender').to_numpy(dtype=float)
-    '''====================================================================================='''
-
-    ### === metric_normalize ===
-    metric_normalize_percentage = np.zeros(metric.shape)
-    metric_normalize_percentage_df = metric_percentage_calculation(metric_normalize_percentage, metric, cname1, cname2)
-
-    ### === metric_log_percentage ===
-    metric_log = np.log(metric+1)
-    #metric_log_df = pd.DataFrame(metric_log,index=cname1, columns=cname2)
-    #metric_log_percentage = np.zeros(metric.shape)
-    #metric_log_percentage_df = metric_percentage_calculation(metric_log_percentage,metric_log, cname1, cname2)
-
-    ### === metric_log_normalize_percentage ===
-    metric_log_percentage_normalize = np.zeros(metric_log.shape)
-    metric_log_percentage_normalize_df = metric_percentage_calculation(metric_log_percentage_normalize, metric_log, cname1, cname2)
-    # metric_log_percentage_normalize_df.to_csv("cell density after log transform and normalization.csv")
+    ''' Choose graph type '''
+    print("What type of information do you want in your plot? Choose 0 or 1 depending on the answer")
+    print('0 for Normalized percentages with meta data and 1 for Logarithm plus Normalized with meta data')
+    ch1 = int(input('Input selection: '))
+    print("")
     
-    ### === Choose graph type ===
-    metric_type = [metric_normalize_percentage_df,metric_log_percentage_normalize_df]
-    
+    print("What name do you want to give your plot?  Do NOT write the file type (e.g., png, jpeg, etc)")
+    ch2 = input('Write name (do not leave spaces): ')
+    print("")
+
     save_parent_directory_normalizing = 'Results/Clustermap/Normalizing'
-    save_parent_directory_sorting = 'Results/Clustermap/Sorting'
-    save_the_image(metric_type, col_colors,save_parent_directory_sorting)
+    save_parent_directory_sorting = 'Results/Clustermap/Sorting'     
+
+    save_clustermap_dir_selection = f'{save_parent_directory_normalizing}/{ch2}.png'        
+    save_legend_dir = f'{save_parent_directory_normalizing}/legend.png'  
+    
+    if ch1 == 0:
+        ### === metric_normalize ===
+        metric_normalize_percentage = np.zeros(metric.shape)
+        metric_normalize_percentage_df = metric_percentage_calculation(metric_normalize_percentage, metric, cname1, cname2)
+        plot_clustermap(metric_normalize_percentage_df, row_colors, col_colors, save_clustermap_dir_selection)
+    elif ch1 == 1:
+        ### === metric_log_normalize_percentage ===
+        metric_log = np.log(metric+1)
+        metric_log_percentage_normalize = np.zeros(metric_log.shape)
+        metric_log_percentage_normalize_df = metric_percentage_calculation(metric_log_percentage_normalize, metric_log, cname1, cname2)
+        # metric_log_percentage_normalize_df.to_csv("cell density after log transform and normalization.csv")
+        plot_clustermap(metric_log_percentage_normalize_df, row_colors, col_colors, save_clustermap_dir_selection)
+    
+    plot_legend(row_palette, col_palette, save_legend_dir)
+
 
 if __name__ == "__main__":
     data_directory = '/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis/Data/Endometrial cancer Panel 2 cell density data'

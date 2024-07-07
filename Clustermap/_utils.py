@@ -38,6 +38,36 @@ def clustering_data_generation(data_directory):
     metric.flat[indtmp] = tmpk
     return metric, cname1, cname2
 
+'''------ Metadata function ------ '''
+def metadata(row_metadata, col_metadata):
+    # Define color palettes for the metadata
+    #new_row_values = [''] * len(row_metadata)  # 创建一个与 df 长度相同的空字符串列表
+    #new_col_values = [''] * len(col_metadata)
+#
+    #row_metadata.insert(loc=0, column='', value=new_row_values)
+    #col_metadata.insert(loc=0, column='', value=new_col_values)
+
+    row_palette = {
+        'Panel': {'Panel1': 'CadetBlue', 'Panel2': 'PowDerBlue'},
+        'Test': {'a': 'Gold', 'b': 'Khaki', 'c':'LemonChiffon'},
+        #'':{'':'white'},
+    }
+    col_palette = {
+        'Gender': {'M': 'LightBlue', 'F': 'LightPink'},
+        'Areca nut': {'Y': 'Orange', 'N': 'Moccasin'},
+        #'':{'':'white'}
+    }
+    # Create row and column color maps
+    col_colors = pd.DataFrame(index=col_metadata.index)
+    for meta_col in col_palette:
+        col_colors[meta_col] = col_metadata[meta_col].map(col_palette[meta_col])
+    
+    row_colors = pd.DataFrame(index=row_metadata.index)
+    for meta_col in row_palette:
+        row_colors[meta_col] = row_metadata[meta_col].map(row_palette[meta_col])
+    
+    return row_colors, col_colors, row_palette, col_palette
+
 '''------ Normalization function ------'''
 def zscore_normalization(row):
     mean_value = row.mean()
@@ -49,19 +79,19 @@ def zscore_normalization(row):
 mergeSort = Sort() # claim the mergeSort
 
 def metric_percentage_calculation(new_metric ,data, index, column):
-    selection = int(input("Select the percentage calculating method: Max-Min or Sorting? Enter 1 for Max-Min, enter 2 for Sorting: "))
+    selection = int(input("Select the percentage calculating method: Max-Min or Sorting? Enter 0 for Max-Min, enter 1 for Sorting: "))
     print("")
     for i in range(new_metric.shape[0]):  
-        normalized_row = zscore_normalization(data[i, :-1].copy())  # 創建副本，避免修改原始數據   
+        normalized_row = zscore_normalization(data[i, :].copy())  # 創建副本，避免修改原始數據   
         # !!! print(f"normalized_row {normalized_row}")
         row_min = normalized_row.min()   #取每橫列中最小值
         row_max = normalized_row.max()   #取每橫列中最大值
         # !!! print(row_min)
         # !!! print(row_max)
-        if selection == 1:
-            new_metric[i, :-1] = (normalized_row - row_min) / (row_max - row_min) * 100
+        if selection == 0:
+            new_metric[i, :] = (normalized_row - row_min) / (row_max - row_min) * 100
             
-        elif selection == 2:
+        elif selection == 1:
             sorted_array = mergeSort.merge_sort(list(normalized_row))
             sorted_array_length = len(sorted_array)
             for j in range(sorted_array_length):    # j= number of patients
@@ -75,7 +105,8 @@ def metric_percentage_calculation(new_metric ,data, index, column):
     metric_df = pd.DataFrame(new_metric, index, column)
     return metric_df
 
-def save_the_image(metric_type, col_colors, save_parent_directory):
+'''
+def save_the_image(metric_type,row_colors, col_colors, save_parent_directory):
     print("What type of information do you want in your plot? Choose 0 or 1 depending on the answer")
     print('0 for Normalized percentages with meta data and 1 for Logarithm plus Normalized with meta data')
     ch1 = int(input('Input selection: '))
@@ -86,4 +117,5 @@ def save_the_image(metric_type, col_colors, save_parent_directory):
     print("")
 
     save_dir_selection = f'{save_parent_directory}/{ch2}.png'        
-    plot_clustermap(metric_type[ch1], col_colors, save_dir_selection)
+    plot_clustermap(metric_type[ch1], row_colors, col_colors, save_dir_selection)
+'''
