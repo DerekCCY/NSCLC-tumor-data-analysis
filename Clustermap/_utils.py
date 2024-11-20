@@ -1,17 +1,20 @@
+import sys
+sys.path.append('/Users/ccy/Documents/NTU/大四上/NSCLC-tumor-data-analysis')
 import pandas as pd
 import numpy as np
 import os
 from plot import *
 from sorting import Sort
+import config
 
 '''------ Clustering data generation ------'''
 def clustering_data_generation(data_directory):
     
     datalist = [f for f in os.listdir(data_directory) if f.endswith('.xlsx')]   #取出母目錄中各子檔案存到datalist
-    
+    print(len(datalist))
     ### === Read Excel ===
     info = []    
-    for i in range(len(datalist) - 1):
+    for i in range(len(datalist)):
         data = pd.read_excel(os.path.join(data_directory, datalist[i]),engine='openpyxl')
         info.append(data.iloc[1:, :].values)            # 取出所有值，除了col名稱  [row, col]
 
@@ -29,6 +32,7 @@ def clustering_data_generation(data_directory):
     ### === Initialize Metric ===
     metric = np.zeros((len(cname1), len(cname2)))  #create an empty metric
     # !!! print(metric)
+    print(metric.shape)
 
     ### === Map the value [ np.ravel_multi_index((u2a, u2b), metric.shape) ]  [ tuple (u2a, u2b)轉換為一維數組 ] ===
     indtmp = np.ravel_multi_index((u2a, u2b), metric.shape)   
@@ -41,11 +45,6 @@ def clustering_data_generation(data_directory):
 '''------ Metadata function ------ '''
 def metadata(row_metadata, col_metadata):
     # Define color palettes for the metadata
-    #new_row_values = [''] * len(row_metadata)  # 创建一个与 df 长度相同的空字符串列表
-    #new_col_values = [''] * len(col_metadata)
-#
-    #row_metadata.insert(loc=0, column='', value=new_row_values)
-    #col_metadata.insert(loc=0, column='', value=new_col_values)
 
     row_palette = {
         'Panel': {'Panel1': 'CadetBlue', 'Panel2': 'PowDerBlue'},
@@ -68,6 +67,30 @@ def metadata(row_metadata, col_metadata):
     
     return row_colors, col_colors, row_palette, col_palette
 
+'''------ Splitting function ------'''
+def split_by_factor(metric, cname1, cname2, col_metadata, split_column=config.COL_SPLIT_FACTOR):
+    # Separate columns based on gender
+    male_indices = col_metadata[col_metadata[split_column] == 'M'].index
+    female_indices = col_metadata[col_metadata[split_column] == 'F'].index
+    
+    # Convert these indices to positions in the original metric (assuming cname2 is aligned with col_metadata)
+    male_indices = np.where(col_metadata.index.isin(male_indices))[0]
+    female_indices = np.where(col_metadata.index.isin(female_indices))[0]
+    
+    # Subset metric for males and females
+    metric_factor1 = metric[:, male_indices]
+    metric_factor2 = metric[:, female_indices]
+    
+    # Subset column names for males and females
+    cname2_factor1 = cname2[male_indices]
+    cname2_factor2 = cname2[female_indices]
+    
+    # Subset metadata for males and females
+    col_metadata_factor1 = col_metadata.iloc[male_indices]
+    col_metadata_factor2 = col_metadata.iloc[female_indices]
+    
+    return (metric_factor1, cname2_factor1, col_metadata_factor1), (metric_factor2, cname2_factor2, col_metadata_factor2)
+
 '''------ Normalization function ------'''
 def zscore_normalization(row):
     mean_value = row.mean()
@@ -81,6 +104,7 @@ mergeSort = Sort() # claim the mergeSort
 def metric_percentage_calculation(new_metric ,data, index, column):
     selection = int(input("Select the percentage calculating method: Max-Min or Sorting? Enter 0 for Max-Min, enter 1 for Sorting: "))
     print("")
+    print(new_metric.shape)
     for i in range(new_metric.shape[0]):  
         normalized_row = zscore_normalization(data[i, :].copy())  # 創建副本，避免修改原始數據   
         # !!! print(f"normalized_row {normalized_row}")
@@ -104,18 +128,3 @@ def metric_percentage_calculation(new_metric ,data, index, column):
 
     metric_df = pd.DataFrame(new_metric, index, column)
     return metric_df
-
-'''
-def save_the_image(metric_type,row_colors, col_colors, save_parent_directory):
-    print("What type of information do you want in your plot? Choose 0 or 1 depending on the answer")
-    print('0 for Normalized percentages with meta data and 1 for Logarithm plus Normalized with meta data')
-    ch1 = int(input('Input selection: '))
-    print("")
-
-    print("What name do you want to give your plot?  Do NOT write the file type (e.g., png, jpeg, etc)")
-    ch2 = input('Write name (do not leave spaces): ')
-    print("")
-
-    save_dir_selection = f'{save_parent_directory}/{ch2}.png'        
-    plot_clustermap(metric_type[ch1], row_colors, col_colors, save_dir_selection)
-'''
