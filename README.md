@@ -14,7 +14,8 @@
 
    - ## Run
       - * `cd Clustermap`
-      - * `python clustermap.py`
+      - * `cd JupyterNotebook`
+      - * `run the latest version`
       - * Select Log normalization and Max-Min method
       
    - ## Results in 'Results/Clustermap/Normalizing' file
